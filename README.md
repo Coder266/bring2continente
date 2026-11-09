@@ -113,7 +113,8 @@ crash or a browser timeout cannot double-add silently.
    and teaches the engine for next week.
 
 The model is optional. The default is deterministic and offline; when enabled it can only pick
-from candidates that already passed the safety gate.
+from candidates that already passed the safety gate. The default model is OpenCode Zen's free
+`opencode/big-pickle` — no paid model is used unless you change `LLM_MODEL`.
 
 <p align="center">
   <img src="docs/review.png" alt="Review queue with product candidates" width="880">
@@ -207,6 +208,7 @@ Everything is environment-driven; see [`.env.example`](.env.example) for the ful
 | `AUTO_ADD_THRESHOLD`      | `0.72`                             | Minimum score for an automatic match                  |
 | `AUTO_ADD_MARGIN`         | `0.12`                             | Minimum lead over the runner-up                       |
 | `LLM_PROVIDER`            | `none`                             | `opencode` or any OpenAI-compatible endpoint          |
+| `LLM_MODEL`               | `opencode/big-pickle`              | Free by default; only safe candidates are offered     |
 | `ON_COMPLETE`             | `remove`                           | What checking a Bring! item off does to the cart      |
 | `CHECKOUT_MODE`           | `ask`                              | `ask`, `auto`, `off`                                  |
 | `MAX_CART_EUR`            | `200`                              | Refuse a batch that would exceed this                 |

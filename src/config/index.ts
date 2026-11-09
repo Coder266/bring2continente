@@ -75,7 +75,7 @@ const schema = z.object({
   MATCH_CANDIDATES: number(8, 2),
 
   LLM_PROVIDER: z.enum(["none", "opencode", "openai"]).default("none"),
-  LLM_MODEL: z.string().default("opencode/deepseek-v4.1-flash"),
+  LLM_MODEL: z.string().default("opencode/big-pickle"),
   LLM_BASE_URL: z.string().default(""),
   LLM_API_KEY: z.string().default(""),
   OPENCODE_COMMAND: z.string().default("opencode"),

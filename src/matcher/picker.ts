@@ -96,9 +96,10 @@ function extractJsonObject(text: string): Record<string, unknown> | null {
   return null;
 }
 
-function parsePick(text: string, candidateIds: Set<string>): PickResult | null {
+export function parsePick(text: string, candidateIds: Set<string>): PickResult | null {
   const objects: Record<string, unknown>[] = [];
-  // `opencode run --format json` can emit one JSON object per line.
+  // `opencode run --format json` emits one event object per line; the model's
+  // answer is in `part.text`, so unwrap that as well.
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed.startsWith("{")) continue;
@@ -110,7 +111,19 @@ function parsePick(text: string, candidateIds: Set<string>): PickResult | null {
   }
   const direct = extractJsonObject(text);
   if (direct) objects.push(direct);
-  for (const obj of objects.reverse()) {
+
+  const answers: Record<string, unknown>[] = [];
+  for (const obj of objects) {
+    const part = obj.part as Record<string, unknown> | undefined;
+    const nested = typeof part?.text === "string" ? extractJsonObject(part.text) : null;
+    if (nested) answers.push(nested);
+    if (typeof obj.text === "string") {
+      const fromText = extractJsonObject(obj.text);
+      if (fromText) answers.push(fromText);
+    }
+  }
+
+  for (const obj of [...objects.reverse(), ...answers.reverse()]) {
     const id = obj.productId;
     if (id === null) {
       return {
