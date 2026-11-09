@@ -69,10 +69,11 @@ export class ProductFactsService {
       labels,
       checkedAt: this.now().toISOString(),
     };
-    this.cache.put(facts);
+    // Do not cache an empty read for a month: a transient label/page failure
+    // should be retried the next time the product is seen.
+    if (labels?.ingredients || labels?.allergens || badge) this.cache.put(facts);
     return facts;
   }
-
   private fresh(facts: GlutenFacts): boolean {
     const checked = Date.parse(facts.checkedAt);
     return Number.isFinite(checked) && this.now().getTime() - checked < this.ttlMs;

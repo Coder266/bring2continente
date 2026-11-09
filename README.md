@@ -48,7 +48,7 @@ fixed.
    butcher/fishmonger/greengrocer run.
 ```
 
-The web UI has five screens: **Painel** (status, cart, actions), **Rever** (candidate picker
+The web UI has six screens: **Painel** (status, cart, actions), **Rever** (candidate picker
 for ambiguous items), **Mapeamentos** (the memory), **Checkout** (confirm the Bring! cleanup),
 **Regras** and **Eventos**.
 

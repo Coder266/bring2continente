@@ -161,9 +161,15 @@ export class McpContinente implements ContinenteAdapter {
   async sessionStatus(): Promise<{ authenticated: boolean; detail?: string }> {
     const data = await this.call<Record<string, unknown>>("get_session_status", {});
     const rec = (data ?? {}) as Record<string, unknown>;
+    const auth = (rec.authentication ?? {}) as Record<string, unknown>;
+    const state = String(auth.state ?? rec.state ?? "").toLowerCase();
+    const authenticated =
+      typeof rec.authenticated === "boolean"
+        ? rec.authenticated
+        : ["valid", "authenticated", "signed_in", "ok", "logged_in"].includes(state);
     return {
-      authenticated: Boolean(rec.authenticated ?? rec.loggedIn ?? rec.sessionValid),
-      detail: typeof rec.detail === "string" ? rec.detail : undefined,
+      authenticated,
+      detail: state || (typeof rec.detail === "string" ? rec.detail : undefined),
     };
   }
 
