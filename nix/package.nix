@@ -29,6 +29,12 @@ buildNpmPackage {
       --set-default CONTINENTE_MCP_ARGS "$out/lib/bring2continente/node_modules/continentept-mcp/dist/cli.js" \
       --set-default PLAYWRIGHT_BROWSERS_PATH "${playwright-driver.browsers}" \
       --prefix PATH : "${nodejs_24}/bin"
+
+    # Expose the MCP CLI for the one-time "continentept-mcp login" step.
+    makeWrapper ${nodejs_24}/bin/node $out/bin/continentept-mcp \
+      --add-flags "$out/lib/bring2continente/node_modules/continentept-mcp/dist/cli.js" \
+      --set-default PLAYWRIGHT_BROWSERS_PATH "${playwright-driver.browsers}" \
+      --prefix PATH : "${nodejs_24}/bin"
     runHook postInstall
   '';
 

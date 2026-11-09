@@ -33,11 +33,12 @@ in
     };
 
     environmentFile = lib.mkOption {
-      type = lib.types.path;
+      type = lib.types.either lib.types.path (lib.types.listOf lib.types.path);
       description = ''
-        File with the secrets and settings from .env.example (BRING_EMAIL,
-        BRING_PASSWORD, BRING_LIST, CONTINENTE_EMAIL, CONTINENTE_PASSWORD,
-        WEB_PASSWORD, SESSION_SECRET, ...). Keep it outside the Nix store.
+        File (or list of files) with the secrets and settings from .env.example
+        (BRING_EMAIL, BRING_PASSWORD, BRING_LIST, CONTINENTE_EMAIL,
+        CONTINENTE_PASSWORD, WEB_PASSWORD, SESSION_SECRET, ...). Keep it outside
+        the Nix store.
       '';
     };
 
