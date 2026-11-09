@@ -54,6 +54,27 @@ in
       description = "System group running the service.";
     };
 
+    createUser = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Create the service user/group. Set to false to run as an existing user
+        (for example, the same user that owns the OpenCode CLI and its auth).
+      '';
+    };
+
+    home = lib.mkOption {
+      type = lib.types.str;
+      default = dataDir;
+      description = "HOME for the service. Point this at the OpenCode user's home when using the model picker.";
+    };
+
+    protectHome = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Apply systemd ProtectHome. Must be false when running as a real user with a home directory.";
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -62,13 +83,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    users.groups.${cfg.group} = { };
-    users.users.${cfg.user} = {
-      isSystemUser = true;
-      group = cfg.group;
-      home = dataDir;
-      createHome = false;
-      description = "bring2continente service user";
+    users.groups = lib.mkIf cfg.createUser { ${cfg.group} = { }; };
+    users.users = lib.mkIf cfg.createUser {
+      ${cfg.user} = {
+        isSystemUser = true;
+        group = cfg.group;
+        home = cfg.home;
+        createHome = false;
+        description = "bring2continente service user";
+      };
     };
 
     systemd.services.bring2continente = {
@@ -83,7 +106,7 @@ in
         PORT = toString cfg.port;
         DATA_DIR = dataDir;
         CONTINENTE_DATA_DIR = "${dataDir}/continente";
-        HOME = dataDir;
+        HOME = cfg.home;
         UI_DIR = "${cfg.package}/lib/bring2continente/dist/web";
         PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
         CONTINENTE_UPDATE_CHECK = "0";
@@ -102,7 +125,7 @@ in
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
-        ProtectHome = true;
+        ProtectHome = cfg.protectHome;
         ReadWritePaths = [ dataDir ];
         RestrictAddressFamilies = [
           "AF_INET"
