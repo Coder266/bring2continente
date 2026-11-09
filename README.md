@@ -171,6 +171,13 @@ that needs one confirmation. Add items and press **Simular pedido** to watch the
 
 ### Real accounts
 
+> **Signed up with Google, Apple or Facebook?** The Bring! API only accepts email + password.
+> Open the Bring! phone app → **Profile → Settings → Change password** and create a
+> Bring-specific password for the same email address, then use that email/password here.
+> It is not your Google password, and Google 2FA does not get in the way. Bring!'s help centre
+> confirms password changes are app-only; if you cannot set one, use “Forgot your password?”
+> on the login screen or contact `feedback@getbring.com`.
+
 Requirements: **Node.js ≥ 24** (for `node:sqlite`) and Chromium for
 `continentept-mcp` (`npx continentept-mcp install-browser`).
 
