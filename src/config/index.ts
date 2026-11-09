@@ -64,7 +64,6 @@ const schema = z.object({
     "Supermercado/Limpeza",
     "Supermercado/Higiene",
     "Supermercado/Animais",
-    "Supermercado/Bebé",
     "Supermercado/Casa",
     "Supermercado/Têxtil",
     "Supermercado/Tecnologia",
