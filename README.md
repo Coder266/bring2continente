@@ -29,6 +29,10 @@ fixed.
 > the public website with a browser. It can break when either site changes. It never places an
 > order or pays. See [Safety and limitations](#safety-and-limitations).
 
+<p align="center">
+  <img src="docs/dashboard.png" alt="bring2continente dashboard" width="880">
+</p>
+
 ---
 
 ## What it looks like
@@ -110,6 +114,10 @@ crash or a browser timeout cannot double-add silently.
 
 The model is optional. The default is deterministic and offline; when enabled it can only pick
 from candidates that already passed the safety gate.
+
+<p align="center">
+  <img src="docs/review.png" alt="Review queue with product candidates" width="880">
+</p>
 
 ## Safety model
 

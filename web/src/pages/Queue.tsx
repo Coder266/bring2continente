@@ -135,7 +135,10 @@ export function Queue({ items, refresh }: { items: Item[]; refresh: () => void }
                   <p className="muted">Nenhum candidato passou as regras.</p>
                 )}
                 {candidates[item.uuid]?.blocked.length ? (
-                  <details className="blocked">
+                  <details
+                    className="blocked"
+                    open={(candidates[item.uuid]?.allowed.length ?? 0) === 0}
+                  >
                     <summary>
                       {candidates[item.uuid]?.blocked.length} candidato(s) bloqueado(s)
                     </summary>
