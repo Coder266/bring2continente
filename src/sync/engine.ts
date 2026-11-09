@@ -654,6 +654,21 @@ export class SyncEngine {
     return { item, allowed, blocked };
   }
 
+  async mappingCandidates(mappingId: number): Promise<{
+    mapping: Mapping;
+    allowed: Array<{ product: Product; score: number; reasons: string[] }>;
+    blocked: Array<{ product: Product; reason: string }>;
+  }> {
+    const mapping = this.deps.store.getMapping(mappingId);
+    if (!mapping) throw new Error("Unknown mapping");
+    const { allowed, blocked } = await this.deps.resolver.candidates({
+      uuid: `mapping-${mappingId}`,
+      itemId: mapping.bringName,
+      specification: mapping.bringSpec ?? "",
+    });
+    return { mapping, allowed, blocked };
+  }
+
   /** Replaces the product behind an existing mapping and fixes the cart lines using it. */
   async swapMapping(mappingId: number, product: Product): Promise<Mapping> {
     const previous = this.deps.store.getMapping(mappingId);

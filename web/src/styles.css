@@ -633,6 +633,12 @@ pre {
   padding: 6px 0;
 }
 
+.correction {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
 /* ---- login ---- */
 .login {
   min-height: 100vh;

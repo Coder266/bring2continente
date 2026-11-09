@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { api, when } from "../api";
 import { Badge } from "../components/Badge";
-import type { Mapping } from "../types";
+import { ProductCard } from "../components/ProductCard";
+import type { Candidate, Mapping, Product } from "../types";
+
+interface FixCandidates {
+  allowed: Candidate[];
+  blocked: Array<{ product: Product; reason: string }>;
+}
 
 export function Mappings({ version }: { version: number }) {
   const [mappings, setMappings] = useState<Mapping[]>([]);
   const [filter, setFilter] = useState("");
   const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fixing, setFixing] = useState<number | null>(null);
+  const [candidates, setCandidates] = useState<Record<number, FixCandidates>>({});
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: version is a refresh trigger
   useEffect(() => {
@@ -31,6 +39,31 @@ export function Mappings({ version }: { version: number }) {
         body: JSON.stringify(body),
       });
       setMappings((prev) => prev.map((m) => (m.id === id ? updated : m)));
+      setFixing(null);
+      setCandidates((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const openFix = async (id: number) => {
+    if (fixing === id) {
+      setFixing(null);
+      return;
+    }
+    setFixing(id);
+    if (candidates[id]) return;
+    setBusy(id);
+    setError(null);
+    try {
+      const data = await api<FixCandidates>(`/api/mappings/${id}/candidates`);
+      setCandidates((prev) => ({ ...prev, [id]: data }));
     } catch (err) {
       setError(String(err));
     } finally {
@@ -147,6 +180,14 @@ export function Mappings({ version }: { version: number }) {
                       )}
                       <button
                         type="button"
+                        className="ghost small"
+                        onClick={() => openFix(mapping.id)}
+                        disabled={busy === mapping.id}
+                      >
+                        {fixing === mapping.id ? "Fechar" : "Corrigir"}
+                      </button>
+                      <button
+                        type="button"
                         className="link danger"
                         onClick={() => remove(mapping.id)}
                         disabled={busy === mapping.id}
@@ -159,6 +200,54 @@ export function Mappings({ version }: { version: number }) {
               ))}
             </tbody>
           </table>
+        )}
+
+        {fixing != null && candidates[fixing] && (
+          <div className="correction">
+            <div className="card-head">
+              <div>
+                <h2>Corrigir “{mappings.find((m) => m.id === fixing)?.bringName}”</h2>
+                <p className="muted small">
+                  Escolhe outro produto. Se o item ainda estiver na lista, a linha do carrinho é
+                  trocada e o novo mapeamento fica guardado.
+                </p>
+              </div>
+              <button type="button" className="ghost" onClick={() => setFixing(null)}>
+                Fechar
+              </button>
+            </div>
+            <div className="candidates">
+              {candidates[fixing]?.allowed.map((candidate) => (
+                <ProductCard
+                  key={candidate.product.id}
+                  product={candidate.product}
+                  score={candidate.score}
+                  reasons={candidate.reasons}
+                  action={{
+                    label: "Usar este",
+                    onClick: () => act(fixing, { productId: candidate.product.id }),
+                  }}
+                />
+              ))}
+              {candidates[fixing]?.allowed.length === 0 && (
+                <p className="muted">Nenhum candidato passou as regras.</p>
+              )}
+              {candidates[fixing]?.blocked.length ? (
+                <details className="blocked" open={candidates[fixing]?.allowed.length === 0}>
+                  <summary>{candidates[fixing]?.blocked.length} candidato(s) bloqueado(s)</summary>
+                  <div className="stack">
+                    {candidates[fixing]?.blocked.map((entry) => (
+                      <ProductCard
+                        key={entry.product.id}
+                        product={entry.product}
+                        reasons={[entry.reason]}
+                      />
+                    ))}
+                  </div>
+                </details>
+              ) : null}
+            </div>
+          </div>
         )}
       </section>
     </div>

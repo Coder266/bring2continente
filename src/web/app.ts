@@ -179,6 +179,15 @@ export function createApp(deps: AppDeps): FastifyInstance {
 
   app.get("/api/mappings", async () => ({ mappings: deps.store.listMappings() }));
 
+  app.get("/api/mappings/:id/candidates", async (req, reply) => {
+    const id = Number((req.params as { id: string }).id);
+    try {
+      return await deps.engine.mappingCandidates(id);
+    } catch (error) {
+      return reply.code(404).send({ error: String(error) });
+    }
+  });
+
   app.patch("/api/mappings/:id", async (req, reply) => {
     const id = Number((req.params as { id: string }).id);
     const body = (req.body ?? {}) as { productId?: string; multiplier?: number; verify?: boolean };
